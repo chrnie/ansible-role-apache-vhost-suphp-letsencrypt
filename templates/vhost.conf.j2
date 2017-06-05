@@ -1,0 +1,42 @@
+# {{ ansible_managed }}
+
+<VirtualHost *:80>
+  ServerAdmin {{item.value.ServerAdmin}}
+  ServerName {{item.key}}
+  ServerAlias {% for ali in item.value.aliases %}{{ali}} {% endfor %}
+  
+  DocumentRoot /var/www/{{item.value.vuser}}/htdocs
+  
+  LogLevel error
+  ErrorLog /var/log/httpd/{{item.value.vuser}}_error.log
+  
+  <Directory /var/www/{{item.value.vuser}}/htdocs>
+    Options +FollowSymlinks
+    # SECTION php_enabled BEGIN.
+    AllowOverride All
+    # SECTION php_enabled END.
+    Allow from all
+  </Directory>
+  
+  # SECTION cgi_support BEGIN.
+  ScriptAlias /cgi-bin/ /var/www/{{item.value.vuser}}/cgi-bin/
+  
+  <Directory /var/www/{{item.value.vuser}}/cgi-bin>
+    AllowOverride AuthConfig Indexes Limit Options=Indexes
+    Allow from all
+  </Directory>
+  # SECTION cgi_support END.
+  
+  <FilesMatch ".+\.ph(p[345]?|t|tml)$">
+    SetHandler None
+  </FilesMatch>
+  
+  <IfModule mod_suphp.c>
+    suPHP_Engine on
+    <FilesMatch "\.php[345]?$">
+      SetHandler x-httpd-suphp
+    </FilesMatch>
+    suPHP_AddHandler x-httpd-suphp
+  </IfModule>
+
+</VirtualHost>

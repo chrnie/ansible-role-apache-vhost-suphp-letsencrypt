@@ -1,2 +1,9 @@
 ---
 # handlers file for chrnie.apache-vhost-suphp-letsencrypt
+
+# our handler
+- name: httpd_restart
+  service: 
+    name: httpd
+    state: restarted
+

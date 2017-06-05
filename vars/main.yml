@@ -1,2 +1,6 @@
 ---
 # vars file for chrnie.apache-vhost-suphp-letsencrypt
+
+vuser_base_dirs:
+  htdocs:
+  cgi-bin:

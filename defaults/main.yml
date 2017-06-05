@@ -1,2 +1,23 @@
 ---
 # defaults file for chrnie.apache-vhost-suphp-letsencrypt
+
+avsl_packages:
+  httpd:
+  httpd-devel:
+  php:
+  php-mysql:
+  php-gd:
+  php-pear:
+  php-xml:
+  php-xmlrpc:
+  php-mbstring:
+  curl:
+  "@Development tools":
+
+avsl_vhosts:
+  "example.org":
+    vuser: vu2001
+    ServerAdmin: webmaster@example.org
+    aliases:
+      - www.example.org
+
