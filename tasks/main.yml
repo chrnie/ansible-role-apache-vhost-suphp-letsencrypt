@@ -7,68 +7,18 @@
     state: "{%if item.value.state is defined %}{{ item.value.state }}{% else %}present{% endif %}"
   with_dict: "{{ avsl_packages }}"
 
-- name: Download suPHP 7.2
-  get_url:
-    url: http://suphp.org/download/suphp-0.7.2.tar.gz
-    dest: /usr/local/src/suphp-0.7.2.tar.gz
-
-- name: Download patch for apache 2.4 -> suPHP 7.2
-  get_url:
-    url: https://lists.marsching.com/pipermail/suphp/attachments/20130520/74f3ac02/attachment.patch
-    dest: /usr/local/src/suphp.patch
-
-- name: untar suPHP 7.2
-  shell: tar xf suphp-0.7.2.tar.gz
-  args:
-    chdir: /usr/local/src
-    creates: /usr/local/src/suphp-0.7.2
-
-- name: Patch suphp
-  shell: 'patch -Np1 -d suphp-0.7.2 < suphp.patch && echo "ansible patched this" > suphp-0.7.2/patched.lock'
-  args:
-    chdir: /usr/local/src
-    creates: /usr/local/src/suphp-0.7.2/patched.lock
-
-- name: 'autoreconf suPHP 7.2 (applies the patch)'
-  shell: autoreconf -if
-  args:
-    chdir: /usr/local/src/suphp-0.7.2
-    creates: /usr/local/src/suphp-0.7.2/Makefile.in
-
-- name: configure suPHP 7.2
-  shell: ./configure --prefix=/usr/ --sysconfdir=/etc/ --with-apr=/usr/bin/apr-1-config --with-apache-user=apache --with-setid-mode=owner --with-logfile=/var/log/httpd/suphp_log
-  args:
-    chdir: /usr/local/src/suphp-0.7.2
-    creates: /usr/local/src/suphp-0.7.2/config.log
-
-- name: compile suPHP 7.2
-  shell: make
-  args:
-    chdir: /usr/local/src/suphp-0.7.2
-    creates: /usr/local/src/suphp-0.7.2/src/suphp
-
-- name: install suPHP 7.2
-  shell: make install 
-  args:
-    chdir: /usr/local/src/suphp-0.7.2
-    creates: /usr/local/src/suphp-0.7.2/src/suphp
-
-- name: copy /etc/suphp.conf
+- name: copy httpd basic config
   copy:
-    src: files/etc-suphp.conf
-    dest: /etc/suphp.conf
+    src: files/etc_httpd/{{item}}
+    dest: /etc/httpd/{{item}}
     owner: root
     group: root
     mode: "0644"
-
-- name: enable module for apache httpd
-  copy:
-    src: files/etc-httpd-conf.modules.d-suphp.conf
-    dest: /etc/httpd/conf.modules.d/suphp.conf
-    owner: root
-    group: root
-    mode: "0644"
-  notify: httpd_restart
+  with_items:
+    - "./conf/httpd.conf"
+    - "./conf.d/ssl.conf"
+    - "./conf.d/welcome.conf"
+    - "./conf.d/security.conf"
 
 - name: "Create httpd site directories in the debian way"
   file: 
@@ -80,6 +30,9 @@
   with_items: 
     - sites-available
     - sites-enabled
+
+- name: Install suPHP
+  include_tasks: suphp.yml
 
 - name: Create vHosts and Users
   include_tasks: addVhost.yml
