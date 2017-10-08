@@ -1,0 +1,5 @@
+---
+
+- name: letsencrypt included
+  debug:
+    msg: "System {{ inventory_hostname }}: vhost {{ item.key }} has letsencrypt enabled: {{item.value.letsencrypt.enable}}"

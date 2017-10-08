@@ -17,8 +17,14 @@
   with_dict: "{{ vuser_base_dirs }}"
   loop_control:
     loop_var: bd_item
- 
-- name: 
+
+- name: "add vhost of {{item.key}}"
   template:
     src: "templates/vhost.conf.j2"
-    dest: "/etc/httpd/sites-enabled/bitcoinrig.de.conf"
+    dest: "/etc/httpd/sites-available/{{item.key}}.conf"
+    force: no
+
+- name: "include letsencrypt for {{item.key}}"
+  include_tasks: letsencrypt.yml
+  when: "item.value.letsencrypt is defined and item.value.letsencrypt.enable is defined and item.value.letsencrypt.enable"
+

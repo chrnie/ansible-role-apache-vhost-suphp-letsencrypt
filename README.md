@@ -8,6 +8,8 @@ Inspired from https://www.howtoforge.com/tutorial/install-suphp-on-centos-7/
 Requirements
 ------------
 
+Works witch Apache httpd on el7 (CentOS/RHEL)
+
 Role Variables
 --------------
 

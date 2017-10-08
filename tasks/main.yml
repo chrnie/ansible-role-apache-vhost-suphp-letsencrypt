@@ -9,12 +9,12 @@
 
 - name: Download suPHP 7.2
   get_url:
-    url: wget http://suphp.org/download/suphp-0.7.2.tar.gz
+    url: http://suphp.org/download/suphp-0.7.2.tar.gz
     dest: /usr/local/src/suphp-0.7.2.tar.gz
 
 - name: Download patch for apache 2.4 -> suPHP 7.2
   get_url:
-    url: wget -O suphp.patch https://lists.marsching.com/pipermail/suphp/attachments/20130520/74f3ac02/attachment.patch
+    url: https://lists.marsching.com/pipermail/suphp/attachments/20130520/74f3ac02/attachment.patch
     dest: /usr/local/src/suphp.patch
 
 - name: untar suPHP 7.2
@@ -70,7 +70,18 @@
     mode: "0644"
   notify: httpd_restart
 
+- name: "Create httpd site directories in the debian way"
+  file: 
+    path: "/etc/httpd/{{item}}"
+    owner: root
+    group: root
+    mode: "0755"
+    state: "directory"
+  with_items: 
+    - sites-available
+    - sites-enabled
+
 - name: Create vHosts and Users
-  include: addVhost.yml
+  include_tasks: addVhost.yml
   with_dict: "{{avsl_vhosts}}"
   when: "avsl_vhosts is defined"

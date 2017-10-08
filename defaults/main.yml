@@ -13,6 +13,8 @@ avsl_packages:
   php-mbstring:
   curl:
   "@Development tools":
+  mod_ssl:
+  python2-certbot-apache:
 
 avsl_vhosts:
   "example.org":
@@ -20,4 +22,8 @@ avsl_vhosts:
     ServerAdmin: webmaster@example.org
     aliases:
       - www.example.org
+    letsencrypt:
+      enable: True
+      redirect_enable: True
+      cronjob: present
 
